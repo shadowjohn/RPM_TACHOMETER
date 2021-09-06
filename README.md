@@ -10,7 +10,7 @@ Nodemcu V2 RPM Tachometer
   <li>D1：PWM 輸入</li>
 </ul>
 
-<img src="RPM_TACHOMETER.png">
+<img src="screenshot/RPM_TACHOMETER.png">
 <br>
 <br>
 <br>
