@@ -10,18 +10,12 @@
  */
 #include <Arduino.h>
 #include <TM1637.h> //七段數位模組
-<<<<<<< HEAD
-const int ToPin = D5;  //凸台、或轉速訊號線
-#define CLK D7
-#define DIO D6
-TM1637 tm1637(CLK, DIO);
-=======
+
 #define ToPin D1    //凸台、或轉速訊號線
 #define CLK D7      //接 TM1637 CLK
 #define DIO D6      //接 TM1637 DIO
 
 TM1637 tm1637(CLK, DIO);  //宣告 TM1637 使用接腳方法
->>>>>>> 0b73c14adaa14862bba18d861ffcabe1d0f2f6c1
 volatile unsigned long C = micros(); //本次偵測到凸台的時間
 volatile unsigned long C_old = 0; //上一次偵測到凸台的時間
 volatile unsigned long rpm = 0; //換算後的轉速
