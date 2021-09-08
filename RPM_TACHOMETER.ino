@@ -9,7 +9,7 @@
  */
 #include <Arduino.h>
 #include <TM1637.h> //七段數位模組
-const int ToPin = D1;  //凸台、或轉速訊號線
+const int ToPin = D5;  //凸台、或轉速訊號線
 #define CLK D7
 #define DIO D6
 TM1637 tm1637(CLK, DIO);
