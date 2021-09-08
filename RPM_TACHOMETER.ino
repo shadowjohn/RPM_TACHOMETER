@@ -6,13 +6,22 @@
  * D7 TM1637 CLK
  * D6 TM1637 DIO
  * D1 接至 PC817，為轉速訊號接入端
+ * 注：使用 Nodemcu 建議避開 D0、D3、D5 等接腳，在有接東西時，過電開機或 Reset 有時都不開，拔掉才能正常...
  */
 #include <Arduino.h>
 #include <TM1637.h> //七段數位模組
+<<<<<<< HEAD
 const int ToPin = D5;  //凸台、或轉速訊號線
 #define CLK D7
 #define DIO D6
 TM1637 tm1637(CLK, DIO);
+=======
+#define ToPin D1    //凸台、或轉速訊號線
+#define CLK D7      //接 TM1637 CLK
+#define DIO D6      //接 TM1637 DIO
+
+TM1637 tm1637(CLK, DIO);  //宣告 TM1637 使用接腳方法
+>>>>>>> 0b73c14adaa14862bba18d861ffcabe1d0f2f6c1
 volatile unsigned long C = micros(); //本次偵測到凸台的時間
 volatile unsigned long C_old = 0; //上一次偵測到凸台的時間
 volatile unsigned long rpm = 0; //換算後的轉速
@@ -30,15 +39,16 @@ volatile unsigned int isShowCount = 0; //每次加一，每經過 100 次才更�
 轉速 14060 轉 = 每分鐘 14060 轉，每秒 240   轉，1轉 = 0.0041667. 秒 =    4.167 ms =    4167us
 轉速 16000 轉 = 每分鐘 16000 轉，每秒 266.6 轉，1轉 = 0.0037500. 秒 =    3.750 ms =    3750us 
 */
-void ICACHE_RAM_ATTR countup() {  //For newest version
-  //收到CDI點火，扣掉偵測到凸台RISING時間
-  //只要是Rising就是Fire
-  C = micros();
-  // (1/(17000/60)0 *1000 * 1000 = 3529
+void ICACHE_RAM_ATTR countup() {      
+  //新版的 Nodemcu 在使用 ISR 中斷，Function 要加上 ICACHE_RAM_ATTR
+  //偵測到凸台RISING，就會觸發此 function countup  
+  C = micros(); //記錄當下的時間
+  // (1/(16000/60) * 1000 * 1000 = 3750
+  // (1/(17000/60) * 1000 * 1000 = 3529  
   // 不可能有超過 17000rpm 的狀況
   RPM_DELAY = C - C_old; //現在的時間減去上一次觸發的時間  
   if(RPM_DELAY < 3500) {
-    //超過 16000rpm 了
+    //超過 17000rpm 了
     return;
   }
   if(RPM_DELAY > 598802) {
@@ -47,38 +57,46 @@ void ICACHE_RAM_ATTR countup() {  //For newest version
     rpm = 0;
     return;
   }    
+  //其他轉速，計算得出轉速度
   rpm = 60000000UL / RPM_DELAY;
+  //把上一次凸台的時間改成現在時間
   C_old = C;  
 }
-void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(250000);
+void setup() {  
+  Serial.begin(250000); //注意包率設很高，要在監視器看的話要改一下
   Serial.println("Counting...");
+  //宣告觸發腳位為 INPUT_PULLUP
   pinMode(ToPin, INPUT_PULLUP);    
-  //中斷觸發
+  //註冊中斷觸發
   attachInterrupt(digitalPinToInterrupt(ToPin), countup, RISING); //RISING
+  //初始化七段顯示器
   tm1637.init();
+  //設定亮度
   tm1637.set(BRIGHT_TYPICAL); //BRIGHT_TYPICAL = 2,BRIGHT_DARKEST = 0,BRIGHTEST = 7; //七段亮度
+  //跑 0000~9999 一次
   playFirstTime();
+  //將七段改成 0
   diaplayOnLed(0);
 }
 
 void loop() {
-
-  // put your main code here, to run repeatedly:
+  //七段顯示器不能一直刷數字，不然人類的眼睛會追不上
+  //isShowCount 每一次都加1，計數100次才改變一次七段顯示器的內容，顯示完就歸零
+  //如果覺得眼睛還是追不上，可以把 100 調大一些，如 150、200
   isShowCount++;  
   if (isShowCount > 100)
-  {
-    //display_rpm();
+  {    
     isShowCount = 0;    
     Serial.println(rpm);        
+    //七段最多顯示到 9999，所以超過 10000 都變 9999
     rpm = (rpm>=10000)?9999:rpm;  
+    //顯示在七段上
     diaplayOnLed(rpm);   
   }  
 }
 void playFirstTime()
 {
-  // 0000~9999 跑二次
+  // 七段顯示 0000~1111~2222~9999 跑一次
   for (int i = 0; i <= 9; i++)
   {
     for (int j = 0; j < 4; j++)
@@ -92,14 +110,11 @@ void playFirstTime()
 void diaplayOnLed(int show_rpm)
 {
   //將轉速，變成顯示值
-  //只顯示 千百十個
-  //如果要顯示 千百十個，就不用除了
-  //太多數位有點眼花
-  //String rpm_str = String(show_rpm/10);
+  //顯示 千百十個  
   String rpm_str = String(show_rpm);
   if (rpm_str.length() <= 3)
   {
-    rpm_str = lpad(rpm_str, 4, "X"); // 變成如 "XXX0"
+    rpm_str = lpad(rpm_str, 4, "X"); // 變成如 "XXX0"，"X600"
   }
   //Serial.print("\nAfter lpad:");
   //Serial.println(rpm_str);
@@ -120,6 +135,7 @@ void diaplayOnLed(int show_rpm)
 }
 String lpad(String temp , byte L , String theword) {
   //用來補LED左邊的空白
+  //字串左側補自定值 theword
   byte mylen = temp.length();
   if (mylen > (L - 1))return temp.substring(0, L - 1);
   for (byte i = 0; i < (L - mylen); i++)
