@@ -2,7 +2,7 @@
  * 七段顯示器 轉速表 RPM TACHOMETER
  * Author: 羽山 (https://3wa.tw)
  * Author: @FB 田峻墉
- * Release Date: 2021-09-06
+ * Release Date: 2021-09-21
  * D7 TM1637 CLK
  * D6 TM1637 DIO
  * D1 接至 PC817，為轉速訊號接入端
@@ -80,10 +80,15 @@ void loop() {
   isShowCount++;  
   if (isShowCount > 100)
   {    
-    isShowCount = 0;    
+    isShowCount = 0;   
+    if(micros() - C_old > 598802) {
+      //2021-09-21 針對訊號源消失的處理
+      //低於 100rpm      
+      rpm = 0;      
+    }
     Serial.println(rpm);        
     //七段最多顯示到 9999，所以超過 10000 都變 9999
-    rpm = (rpm>=10000)?9999:rpm;  
+    //rpm = (rpm>=10000)?9999:rpm;  
     //顯示在七段上
     diaplayOnLed(rpm);   
   }  
