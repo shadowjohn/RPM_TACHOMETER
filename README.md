@@ -9,7 +9,8 @@ Nodemcu V2 RPM Tachometer
   <li>D6：TM1637 DIO</li>
   <li>D1：PWM 輸入</li>
 </ul>
-
+<img src="screenshot/s1.jpg">
+<br>
 <img src="screenshot/RPM_TACHOMETER.png">
 <br>
 <br>
