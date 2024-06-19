@@ -19,7 +19,7 @@ Nodemcu V2 RPM Tachometer
   <source src="screenshot/PIXEL.mp4" type="video/mp4" />
 </video>  
 <br>
-<img src="screenshot/s1.jpg">
+<img src="screenshot/s2.jpg">
 <br>
 <img src="screenshot/RPM_TACHOMETER.png">
 <br>
