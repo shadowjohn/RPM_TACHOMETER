@@ -15,6 +15,10 @@ Nodemcu V2 RPM Tachometer
 </ul>
 <img src="screenshot/PIXEL2.jpg">
 <br>
+<video autoplay loop style="width:100%; height: auto; position:absolute; z-index: -1;">
+  <source src="screenshot/PIXEL.mp4" type="video/mp4" />
+</video>  
+<br>
 <img src="screenshot/s1.jpg">
 <br>
 <img src="screenshot/RPM_TACHOMETER.png">
