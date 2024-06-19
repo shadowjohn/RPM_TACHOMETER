@@ -8,6 +8,16 @@
  * D1 接至 PC817，為轉速訊號接入端
  * 注：使用 Nodemcu 建議避開 D0、D3、D5 等接腳，在有接東西時，過電開機或 Reset 有時都不開，拔掉才能正常...
  */
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+ #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
+#endif
+#define LED_PIN    D2 //接 Pixel LED
+// How many NeoPixels are attached to the Arduino?
+#define NUMPIXELS 16
+// Declare our NeoPixel strip object:
+Adafruit_NeoPixel strip(NUMPIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
+ 
 #include <Arduino.h>
 #include <TM1637.h> //七段數位模組
 
@@ -56,9 +66,47 @@ void ICACHE_RAM_ATTR countup() {
   //把上一次凸台的時間改成現在時間
   C_old = C;  
 }
+// 轉速範圍對應顏色
+uint32_t getRPMColor(int rpm) {
+  if (rpm <= 6000) {
+    return strip.Color(0, 255, 0); // 綠色
+  } else if (rpm <= 8000) {
+    return strip.Color(255, 255, 0); // 黃色
+  } else if (rpm <= 9500) {
+    return strip.Color(255, 165, 0); // 橙色
+  } else if (rpm < 10000) {
+    return strip.Color(255, 0, 0); // 紅色
+  } else {
+    static bool blinkState = false;
+    blinkState = !blinkState;
+    return blinkState ? strip.Color(255, 0, 0) : strip.Color(0, 0, 0); // 紅色閃爍
+  }
+}
+uint32_t blendColors(uint32_t color1, uint32_t color2, int blend) {
+  uint8_t r1 = (color1 >> 16) & 0xFF;
+  uint8_t g1 = (color1 >> 8) & 0xFF;
+  uint8_t b1 = color1 & 0xFF;
+
+  uint8_t r2 = (color2 >> 16) & 0xFF;
+  uint8_t g2 = (color2 >> 8) & 0xFF;
+  uint8_t b2 = color2 & 0xFF;
+
+  uint8_t r = (r1 * (255 - blend) + r2 * blend) / 255;
+  uint8_t g = (g1 * (255 - blend) + g2 * blend) / 255;
+  uint8_t b = (b1 * (255 - blend) + b2 * blend) / 255;
+
+  return strip.Color(r, g, b);
+}
 void setup() {  
   Serial.begin(250000); //注意包率設很高，要在監視器看的話要改一下
   Serial.println("Counting...");
+  #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
+    clock_prescale_set(clock_div_1);
+  #endif
+  strip.begin();
+  strip.show(); // Initialize all pixels to 'off'
+  strip.setBrightness(20);
+  
   //宣告觸發腳位為 INPUT_PULLUP
   pinMode(ToPin, INPUT_PULLUP);    
   //註冊中斷觸發
@@ -70,7 +118,7 @@ void setup() {
   //跑 0000~9999 一次
   playFirstTime();
   //將七段改成 0
-  displayOnLed(0);
+  displayOnLed(0);  
 }
 
 void loop() {
@@ -94,7 +142,15 @@ void loop() {
     //如果為 4 行程引擎，要 x 2 倍
     //rpm *= 2;
     displayOnLed(rpm);   
-  }  
+  } 
+  /*else
+  { 
+    for(int i=1000;i<=12000;i+=1000)
+    {
+      displayOnLed(i); // 顯示 1500 RPM
+      delay(500);    
+    }
+  }*/
 }
 void playFirstTime()
 {
@@ -134,6 +190,46 @@ void displayOnLed(int show_rpm)
       tm1637.display(i, String(rpm_str[i]).toInt());
     }
   }
+
+
+  // 將轉速顯示在NeoPixel LED
+  int led_count = map(show_rpm, 0, 9999, 0, NUMPIXELS);
+  for (int i = 0; i < NUMPIXELS; i++) {
+    if (i < led_count) {
+      uint32_t color1, color2;
+      int range_start, range_end;
+
+      if (show_rpm <= 6000) {
+        color1 = strip.Color(0, 255, 0); // 綠色
+        color2 = strip.Color(0, 255, 0); // 綠色
+        range_start = 0;
+        range_end = 6000;
+      } else if (show_rpm <= 8000) {
+        color1 = strip.Color(0, 255, 0); // 綠色
+        color2 = strip.Color(255, 255, 0); // 黃色
+        range_start = 6000;
+        range_end = 8000;
+      } else if (show_rpm <= 9500) {
+        color1 = strip.Color(255, 255, 0); // 黃色
+        color2 = strip.Color(255, 165, 0); // 橙色
+        range_start = 8000;
+        range_end = 9500;
+      } else {
+        color1 = strip.Color(255, 165, 0); // 橙色
+        color2 = strip.Color(255, 0, 0); // 紅色
+        range_start = 9500;
+        range_end = 10000;
+      }
+
+      int local_rpm = map(show_rpm, range_start, range_end, 0, 255);
+      uint32_t color = blendColors(color1, color2, local_rpm);
+      strip.setPixelColor(i, color);
+    } else {
+      strip.setPixelColor(i, 0); // 關閉LED
+    }
+  }
+  strip.show();
+  
 }
 String lpad(String temp , byte L , String theword) {
   //用來補LED左邊的空白
