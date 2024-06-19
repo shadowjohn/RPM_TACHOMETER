@@ -2,7 +2,7 @@
  * 七段顯示器 轉速表 RPM TACHOMETER
  * Author: 羽山 (https://3wa.tw)
  * Author: @FB 田峻墉
- * Release Date: 2021-09-21
+ * Release Date: 2024-06-20
  * D7 TM1637 CLK
  * D6 TM1637 DIO
  * D1 接至 PC817，為轉速訊號接入端
