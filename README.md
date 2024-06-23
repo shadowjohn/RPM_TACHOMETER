@@ -6,6 +6,12 @@ Nodemcu V2 RPM Tachometer
 2024-06-20
 新增 WS2812B Pixel RGB LED 輸出
 
+<h2>相依套件</h2>
+<ul>
+  <li>1. Grove 4-Digit Display</li>
+  <li>2. Adafruit NeoPixel</li>
+</ul>
+
 <h2>接腳</h2>
 <ul>
   <li>D7：TM1637 CLK</li>
@@ -21,7 +27,7 @@ Nodemcu V2 RPM Tachometer
 <br>
 <img src="screenshot/s2.jpg">
 <br>
-<img src="screenshot/RPM_TACHOMETER.png">
+<img src="screenshot/RPM_TACHOMETER_PIXEL.png">
 <br>
 <br>
 <br>
