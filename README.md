@@ -35,4 +35,8 @@ Nodemcu V2 RPM Tachometer
 <ul>
   <li>1. 影片：https://youtu.be/PMCvIjvCGIU</li>
   <li>2. 說明：https://3wa.tw/blog/blog.php?id=1929</li>
+  <li>3. 說明：(WS2812B) https://3wa.tw/blog/blog.php?id=2086</li>
+  <li>4. 酷龍150 - 自製轉速表Part1：https://3wa.tw/blog/blog.php?id=2081</li>
+  <li>5. 酷龍150 - 自製轉速表Part2：https://3wa.tw/blog/blog.php?id=2082</li>
+  <li>6. KTM RC390 自製轉速表：https://3wa.tw/blog/blog.php?id=2083</li>
 </ul>  
