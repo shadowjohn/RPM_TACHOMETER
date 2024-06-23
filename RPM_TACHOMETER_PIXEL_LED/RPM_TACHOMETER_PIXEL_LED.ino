@@ -6,6 +6,7 @@
  * D7 TM1637 CLK
  * D6 TM1637 DIO
  * D1 接至 PC817，為轉速訊號接入端
+ * D2 接 Pixel LED DI
  * 注：使用 Nodemcu 建議避開 D0、D3、D5 等接腳，在有接東西時，過電開機或 Reset 有時都不開，拔掉才能正常...
  */
 #include <Adafruit_NeoPixel.h>
