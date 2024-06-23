@@ -10,12 +10,15 @@
  * 
  * 註：因為要使用 Pixel RGB LED ATTiny85 的 Clock 要設定為 Internal 16mhz
  * 調整 Internal 16mhz 後，必需要重新燒錄 Bootloader 才會生效!
+
+ 相依套件：
+   1. Grove 4-Digit Display
+   2. Adafruit_NeoPixel
 */
 #include <Arduino.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <Adafruit_NeoPixel.h>
-//From : https://github.com/dmadison/FastLED_NeoPixel
 
 // 接 Pixel RGB LED DI 腳，接到 (腳PB4 引腳3)
 #define LED_PIN  PB4  
