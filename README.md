@@ -33,6 +33,8 @@ Nodemcu V2 RPM Tachometer
 <br>
 <img src="screenshot/RPM_TACHOMETER_v2_PIXEL_LED.png">
 <br>
+<img src="screenshot/ATTINY85_PIXEL.jpg">
+<br>
 <br>
 <br>
 詳細心得參考：
